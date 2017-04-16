@@ -65,5 +65,11 @@
             <version>4.0.3</version>
         </dependency>
 
+        <!-- Built Project Properties -->
+        <dependency>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+            <version>1.3.1</version>
+        </dependency>
     </dependencies>
 </project>
