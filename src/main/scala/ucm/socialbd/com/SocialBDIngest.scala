@@ -7,7 +7,7 @@ import ucm.socialbd.com.kafkaclient.{KafkaProducerAirQuality, KafkaProducerTraff
   * Created by Jeff on 16/04/2017.
   */
 
-object IngestSocialBD {
+object SocialBDIngest {
   val ingestNames = Set("AIR", "TRAFFIC", "TWITTER")
 
   def printUsage(exit: Boolean = false): Unit = {
