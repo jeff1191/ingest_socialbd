@@ -4,7 +4,7 @@ import java.util.Properties
 
 import org.apache.kafka.clients.producer.KafkaProducer
 import ucm.socialbd.com.config.SocialBDProperties
-import ucm.socialbd.com.utils.TwitterUtils
+import ucm.socialbd.com.utils.{SocialBDConfig, TwitterUtils}
 
 /**
   * Created by Jeff on 09/03/2017.
@@ -12,13 +12,7 @@ import ucm.socialbd.com.utils.TwitterUtils
 class KafkaProducerTwitter(socialBDProperties: SocialBDProperties) extends KafkaProducerActions{
 
   override def process(): Unit = {
-    val props = new Properties()
-
-    props.put("bootstrap.servers", socialBDProperties.urlKafka)
-    props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-    props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-    props.put("key-class-type", "java.lang.String")
-    props.put("value-class-type", "java.lang.String")
+    val  props = SocialBDConfig.getProperties(socialBDProperties)
 
     val producer = new KafkaProducer[String, String](props)
 

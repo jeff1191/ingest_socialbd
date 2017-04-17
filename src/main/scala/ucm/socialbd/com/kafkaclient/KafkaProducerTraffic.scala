@@ -5,6 +5,7 @@ import java.util.Properties
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.json.{JSONArray, XML}
 import ucm.socialbd.com.config.SocialBDProperties
+import ucm.socialbd.com.utils.SocialBDConfig
 
 import scalaj.http._
 /**
@@ -13,11 +14,7 @@ import scalaj.http._
 class KafkaProducerTraffic(socialBDProperties: SocialBDProperties) extends KafkaProducerActions{
 
   override def process(): Unit = {
-    val  props = new Properties()
-    props.put("bootstrap.servers", socialBDProperties.urlKafka)
-
-    props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-    props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+    val  props = SocialBDConfig.getProperties(socialBDProperties)
 
     val producer = new KafkaProducer[String, String](props)
 
@@ -27,6 +24,8 @@ class KafkaProducerTraffic(socialBDProperties: SocialBDProperties) extends Kafka
       val ret: JSONArray = fromXMLJSONArray(response.body)
       val itJSON = ret.iterator()
       while(itJSON.hasNext) {
+        val message = "" + itJSON.next()
+        println(message)
         val record = new ProducerRecord(socialBDProperties.trafficConf.trafficTopic, "key", "" + itJSON.next())
         producer.send(record)
         Thread.sleep(100) //delay between json messages
