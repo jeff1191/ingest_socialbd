@@ -27,7 +27,7 @@ class KafkaProducerAirQuality(socialBDProperties: SocialBDProperties) extends Ka
         println(message)
         val record = new ProducerRecord(socialBDProperties.qualityAirConf.qualityAirTopic, "key", message)
         producer.send(record)
-        Thread.sleep(100) //delay between events
+        Thread.sleep(4000) //delay between events
       }
       Thread.sleep(socialBDProperties.qualityAirConf.delay) // delay between requests to the web page
     }
@@ -36,35 +36,36 @@ class KafkaProducerAirQuality(socialBDProperties: SocialBDProperties) extends Ka
   //Convert a line of csv in a Json Object
   def csvToJsonString(content: String): String = {
     val mapper = content.split(",")
-    s"""{"estacion" : "${mapper(0)}|${mapper(1)}|${mapper(2)}",
+    s"""{"estacion" : "${mapper(0)}${mapper(1)}${mapper(2)}",
         |"magnitud" : "${mapper(3)}",
         |"tecnica": "${mapper(4)}",
         |"horario": "${mapper(5)}",
         |"fecha": "${mapper(6)}-${mapper(7)}-${mapper(8)}",
-        |"H1": "${mapper(9)}", "isValidH1": "${mapper(10)}",
-        |"H2": "${mapper(11)}", "isValidH2": "${mapper(12)}",
-        |"H3": "${mapper(13)}", "isValidH3": "${mapper(14)}",
-        |"H4": "${mapper(15)}", "isValidH4": "${mapper(16)}",
-        |"H5": "${mapper(17)}", "isValidH5": "${mapper(18)}",
-        |"H6": "${mapper(19)}", "isValidH6": "${mapper(20)}",
-        |"H7": "${mapper(21)}", "isValidH7": "${mapper(22)}",
-        |"H8": "${mapper(23)}", "isValidH8": "${mapper(24)}",
-        |"H9": "${mapper(25)}", "isValidH9": "${mapper(26)}",
-        |"H10": "${mapper(27)}", "isValidH10": "${mapper(28)}",
-        |"H11": "${mapper(29)}", "isValidH11": "${mapper(30)}",
-        |"H12": "${mapper(31)}", "isValidH12": "${mapper(32)}",
-        |"H13": "${mapper(33)}", "isValidH13": "${mapper(34)}",
-        |"H14": "${mapper(35)}", "isValidH14": "${mapper(36)}",
-        |"H15": "${mapper(37)}", "isValidH15": "${mapper(38)}",
-        |"H16": "${mapper(39)}", "isValidH16": "${mapper(40)}",
-        |"H17": "${mapper(41)}", "isValidH17": "${mapper(42)}",
-        |"H18": "${mapper(43)}", "isValidH18": "${mapper(44)}",
-        |"H19": "${mapper(45)}", "isValidH19": "${mapper(46)}",
-        |"H20": "${mapper(47)}", "isValidH20": "${mapper(48)}",
-        |"H21": "${mapper(49)}", "isValidH21": "${mapper(50)}",
-        |"H22": "${mapper(51)}", "isValidH22": "${mapper(52)}",
-        |"H23": "${mapper(53)}", "isValidH23": "${mapper(54)}",
-        |"H24": "${mapper(55)}", "isValidH24": "${mapper(56)}" }""".stripMargin.replace("\n","").replace("\r", "")
+        |"listaHoras": [
+        |{"hora": "00:00", "valor": "${mapper(9)}", "isValid": "${mapper(10)}"},
+        |{"hora": "01:00", "valor": "${mapper(11)}", "isValid": "${mapper(12)}"},
+        |{"hora": "02:00", "valor": "${mapper(13)}", "isValid": "${mapper(14)}"},
+        |{"hora": "03:00", "valor": "${mapper(15)}", "isValid": "${mapper(16)}"},
+        |{"hora": "04:00", "valor": "${mapper(17)}", "isValid": "${mapper(18)}"},
+        |{"hora": "05:00", "valor": "${mapper(19)}", "isValid": "${mapper(20)}"},
+        |{"hora": "06:00", "valor": "${mapper(21)}", "isValid": "${mapper(22)}"},
+        |{"hora": "07:00", "valor": "${mapper(23)}", "isValid": "${mapper(24)}"},
+        |{"hora": "08:00", "valor": "${mapper(25)}", "isValid": "${mapper(26)}"},
+        |{"hora": "09:00", "valor": "${mapper(27)}", "isValid": "${mapper(28)}"},
+        |{"hora": "10:00", "valor": "${mapper(29)}", "isValid": "${mapper(30)}"},
+        |{"hora": "11:00", "valor": "${mapper(31)}", "isValid": "${mapper(32)}"},
+        |{"hora": "12:00", "valor": "${mapper(33)}", "isValid": "${mapper(34)}"},
+        |{"hora": "13:00", "valor": "${mapper(35)}", "isValid": "${mapper(36)}"},
+        |{"hora": "14:00", "valor": "${mapper(37)}", "isValid": "${mapper(38)}"},
+        |{"hora": "15:00", "valor": "${mapper(39)}", "isValid": "${mapper(40)}"},
+        |{"hora": "16:00", "valor": "${mapper(41)}", "isValid": "${mapper(42)}"},
+        |{"hora": "17:00", "valor": "${mapper(43)}", "isValid": "${mapper(44)}"},
+        |{"hora": "18:00", "valor": "${mapper(45)}", "isValid": "${mapper(46)}"},
+        |{"hora": "19:00", "valor": "${mapper(47)}", "isValid": "${mapper(48)}"},
+        |{"hora": "20:00", "valor": "${mapper(49)}", "isValid": "${mapper(50)}"},
+        |{"hora": "21:00", "valor": "${mapper(51)}", "isValid": "${mapper(52)}"},
+        |{"hora": "22:00", "valor": "${mapper(53)}", "isValid": "${mapper(54)}"},
+        |{"hora": "23:00", "valor": "${mapper(55)}", "isValid": "${mapper(56)}"} ] }""".stripMargin.replace("\n","").replace("\r", "")
   }
 
 }
