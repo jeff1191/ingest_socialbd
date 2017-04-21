@@ -28,7 +28,7 @@ class KafkaProducerTraffic(socialBDProperties: SocialBDProperties) extends Kafka
         println(message)
         val record = new ProducerRecord(socialBDProperties.trafficConf.trafficTopic, "key", "" + itJSON.next())
         producer.send(record)
-        Thread.sleep(100) //delay between json messages
+        Thread.sleep(4000) //delay between json messages
       }
       Thread.sleep(socialBDProperties.trafficConf.delay) // delay between request to the web page
     }
