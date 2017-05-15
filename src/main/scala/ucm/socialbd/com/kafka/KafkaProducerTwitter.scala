@@ -1,4 +1,4 @@
-package ucm.socialbd.com.kafkaclient
+package ucm.socialbd.com.kafka
 
 import java.util.Properties
 

@@ -13,7 +13,6 @@ object SocialBDConfig {
     val properties = new Properties()
     // comma separated list of Kafka brokers
     properties.setProperty("bootstrap.servers", socialBDProperties.urlKafka)
-
     properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
     properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
     properties.put("key-class-type", "java.lang.String")
