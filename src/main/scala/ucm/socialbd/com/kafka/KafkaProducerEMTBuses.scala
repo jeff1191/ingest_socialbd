@@ -8,8 +8,10 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.json.{JSONArray, JSONException, XML}
 import org.slf4j.LoggerFactory
 import ucm.socialbd.com.config.SocialBDProperties
-import ucm.socialbd.com.utils.SocialBDConfig
+import ucm.socialbd.com.utils.{DateUtil, SocialBDConfig}
+import net.liftweb.json._
 
+import scala.io.Source._
 import scalaj.http._
 
 /**
@@ -17,56 +19,79 @@ import scalaj.http._
   */
 class KafkaProducerEMTBuses(socialBDProperties: SocialBDProperties) extends KafkaProducerActions{
   private val logger = LoggerFactory.getLogger(getClass)
-
+  private val stopList = fromFile(getClass.getResource("/listadoParadasEMT").getPath).getLines.toList.map(x => x.split(",")(1))
+  private var nParada = 0
   override def process(): Unit = {
     val props = SocialBDConfig.getProperties(socialBDProperties)
     val producer = new KafkaProducer[String, String](props)
     try{
-      while(true) {//requesting every 5 minutes regard if the field Last-Modified have changed
-
-        val response: HttpResponse[String] = Http(socialBDProperties.eMTBusesConf.urlEMTBuses).asString
-        println(response.headers)
-        val eventTime = response.headers.getOrElse("Date","Problem encountered").asInstanceOf[Vector[String]](0)
-        val formattedDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US).parse(eventTime)
-        val fechaHora = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(formattedDate)
-
-        val ret: JSONArray = fromXMLJSONArray(response.body)
-        val itJSON = ret.iterator()
-        while(itJSON.hasNext) {
-          val message = ("" + itJSON.next()).replaceFirst("}",",\"timestamp\":"+ s""""$fechaHora"}""")
-          println(message)
-          val record = new ProducerRecord(socialBDProperties.eMTBusesConf.emtbusesTopic, "key", message)
-          producer.send(record)
-          Thread.sleep(3000) //delay between json messages
+      while(true) {
+        if(nParada != stopList.size - 1) //skip header
+          nParada = nParada + 1
+        else{
+          System.exit(1)
+          nParada = 1
         }
-        System.exit(1)
+        Thread.sleep(10000)
+        val urlRequest = socialBDProperties.eMTBusesConf.urlEMTBuses.replace("#inputIdStop#",stopList(nParada))
+        val response: HttpResponse[String] = Http(urlRequest).asString
+        val eventTime = response.headers.getOrElse("Date","Problem encountered").asInstanceOf[Vector[String]](0)
+        val fechaHora = DateUtil.getDateFormatted(eventTime)
+
+        val json = net.liftweb.json.Xml.toJson(xml.XML.loadString(response.body).child)
+
+        println(compactRender(json))
+
+        var stopLines = compactRender(json \ "StopLines" \ "Data")
+        if (!stopLines.contains("["))
+          stopLines = "[" + compactRender(json \ "StopLines"\ "Data") + "]"
+
+
+        var listArrive = compactRender(json \ "ListaArriveEstimation" \ "Arrive")
+        if(!listArrive.contains("["))
+          listArrive ="[" + compactRender(json \ "ListaArriveEstimation" \ "Arrive") + "]"
+
+
+        val jsonString =
+          s"""{"idStop":${compactRender(json \ "Label")},
+             |"DescriptionStop":${compactRender(json \ "Description")},
+             |"Direction":${compactRender(json \ "Direction")},
+             |"StopLine":${stopLines},
+             |"ArriveEstimation":${listArrive},
+             |"timestamp": "${fechaHora}"}""".stripMargin.replace("\n","").replace("\r","")
+          println(jsonString)
+          val record = new ProducerRecord(socialBDProperties.eMTBusesConf.emtbusesTopic, "key", jsonString)
+          producer.send(record)
       }
-      producer.close()
     }
     catch{
       case e: NoSuchElementException =>{
-        logger.warn("NoSuchElementException, reconnecting...")
+        logger.warn("NoSuchElementException, reconnecting..." + e.getMessage)
         process() //reconnect
       }
       case e: SocketTimeoutException => {
-        logger.warn("SocketTimeoutException, reconnecting...")
+        logger.warn("SocketTimeoutException, reconnecting..." + e.getMessage)
         process()//reconnect
       }
       case e : JSONException => {
-        logger.warn("JSONException, reconnecting...")
+        logger.warn("JSONException, reconnecting..." + e.getMessage)
         process()//reconnect
       }
-      case e: Exception => {
-        logger.warn("Unknown exception, reconnecting...")
+      case e : RuntimeException => {
+        logger.warn("JSONException, reconnecting..." + e.getMessage)
+        nParada = nParada + 1 //next event
         process()//reconnect
       }
     }
-    producer.close()
+//    producer.close()
 
   }
   def fromXMLJSONArray(xml: String): JSONArray ={
     val jsonObj = XML.toJSONObject(xml)
     val arr = jsonObj.getJSONObject(jsonObj.keys().next())
     arr.getJSONArray(arr.keys().next())
+  }
+  def fromXMLtoJSON(xml:String): Unit ={
+
   }
 }

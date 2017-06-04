@@ -9,7 +9,7 @@ import ucm.socialbd.com.kafka._
   */
 
 object SocialBDIngest {
-  val ingestNames = Set("AIR", "TRAFFIC", "TWITTER","BICIMAD", "EMTBUSES")
+  private val ingestNames = Set("AIR", "TRAFFIC", "TWITTER","BICIMAD", "EMTBUS")
 
   def printUsage(exit: Boolean = false): Unit = {
     println ("Arguments:<ingest name> <mode>")
@@ -33,7 +33,7 @@ object SocialBDIngest {
       case "TRAFFIC" => new KafkaProducerTraffic(conf)
       case "TWITTER" => new KafkaProducerTwitter(conf)
       case "BICIMAD" => new KafkaProducerBiciMAD(conf)
-      case "EMTBUSES" => new KafkaProducerEMTBuses(conf)
+      case "EMTBUS" => new KafkaProducerEMTBuses(conf)
       case _ => {
         println (s"Unrecognized ingest type ${args(0)}")
         printUsage(exit = false)

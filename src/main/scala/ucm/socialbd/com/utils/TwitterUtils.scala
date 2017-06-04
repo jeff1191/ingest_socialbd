@@ -46,7 +46,10 @@ object TwitterUtils {
   def publishTweet(kafkaProducer: KafkaProducer[String, String],
                    kafkaTopic: String,
                    status: Status): Unit = {
-    val tweetMessage = new ProducerRecord[String, String](kafkaTopic,copyToJsonString(status))
+    val msg = copyToJsonString(status)
+    println(msg)
+    val tweetMessage = new ProducerRecord[String, String](kafkaTopic,msg)
+
     kafkaProducer.send(tweetMessage)
   }
 

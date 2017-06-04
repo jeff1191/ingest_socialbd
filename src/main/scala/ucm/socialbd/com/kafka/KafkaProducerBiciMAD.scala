@@ -38,25 +38,25 @@ class KafkaProducerBiciMAD(socialBDProperties: SocialBDProperties) extends Kafka
           println(message)
           val record = new ProducerRecord(socialBDProperties.biciMadConf.bicimadTopic, "key", message)
           producer.send(record)
-          Thread.sleep(3000)
+          Thread.sleep(10)
         }
         System.exit(1)
     }
   }catch{
       case e: NoSuchElementException =>{
-        logger.warn("NoSuchElementException, reconnecting...")
+        logger.warn("NoSuchElementException, reconnecting..." + e.getMessage)
         process() //reconnect
       }
       case e: SocketTimeoutException => {
-        logger.warn("SocketTimeoutException, reconnecting...")
+        logger.warn("SocketTimeoutException, reconnecting..." + e.getMessage)
         process()//reconnect
       }
       case e : JSONException => {
-        logger.warn("JSONException, reconnecting...")
+        logger.warn("JSONException, reconnecting..." + e.getMessage)
         process()//reconnect
       }
       case e: Exception => {
-        logger.warn("Unknown exception, reconnecting...")
+        logger.warn("Unknown exception, reconnecting..." + e.getMessage)
         process()//reconnect
       }
     }

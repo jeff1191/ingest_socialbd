@@ -26,7 +26,7 @@ class KafkaProducerTraffic(socialBDProperties: SocialBDProperties) extends Kafka
       println(response.headers)
       val eventTime = response.headers.getOrElse("Date","Problem encountered").asInstanceOf[Vector[String]](0)
       val formattedDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US).parse(eventTime)
-      val fechaHora = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(formattedDate)
+      val fechaHora = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(formattedDate)
 
       val ret: JSONArray = fromXMLJSONArray(response.body)
       val itJSON = ret.iterator()
@@ -41,27 +41,27 @@ class KafkaProducerTraffic(socialBDProperties: SocialBDProperties) extends Kafka
           val record = new ProducerRecord(socialBDProperties.trafficConf.interUrbanTrafficTopic, "key", message)
           producer.send(record)
         }
-        Thread.sleep(20) //delay between json messages
+        Thread.sleep(10) //delay between json messages
       }
-     // System.exit(1)
-      Thread.sleep(socialBDProperties.trafficConf.delay) // delay between request to the web page
+//      System.exit(1)
+      Thread.sleep(1* 60 * 1000) // delay between request to the web page
     }
     }
     catch{
       case e: NoSuchElementException =>{
-        logger.warn("NoSuchElementException, reconnecting...")
+        logger.warn("NoSuchElementException, reconnecting..." + e.getMessage)
         process() //reconnect
       }
       case e: SocketTimeoutException => {
-        logger.warn("SocketTimeoutException, reconnecting...")
+        logger.warn("SocketTimeoutException, reconnecting..." + e.getMessage)
         process()//reconnect
       }
       case e : JSONException => {
-        logger.warn("JSONException, reconnecting...")
+        logger.warn("JSONException, reconnecting..." + e.getMessage)
         process()//reconnect
       }
       case e: Exception => {
-        logger.warn("Unknown exception, reconnecting...")
+        logger.warn("Unknown exception, reconnecting..." + e.getMessage)
         process()//reconnect
       }
     }

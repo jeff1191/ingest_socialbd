@@ -27,7 +27,7 @@ class KafkaProducerAirQuality(socialBDProperties: SocialBDProperties) extends Ka
         println(message)
         val record = new ProducerRecord(socialBDProperties.qualityAirConf.qualityAirTopic, "key", message)
         producer.send(record)
-        Thread.sleep(4000) //delay between events
+        Thread.sleep(10) //delay between events
       }
       Thread.sleep(socialBDProperties.qualityAirConf.delay) // delay between requests to the web page
     }
