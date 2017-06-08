@@ -43,7 +43,6 @@ class KafkaProducerTraffic(socialBDProperties: SocialBDProperties) extends Kafka
         }
         Thread.sleep(10) //delay between json messages
       }
-//      System.exit(1)
       Thread.sleep(1* 60 * 1000) // delay between request to the web page
     }
     }

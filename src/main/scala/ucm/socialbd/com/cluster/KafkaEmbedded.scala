@@ -11,8 +11,8 @@ import ucm.socialbd.com.config.SocialBDProperties
 object KafkaEmbedded extends EmbeddedCluster{
   def initCluster(socialBDProperies:SocialBDProperties): Unit = {
     val kafkaLocalBroker = new KafkaLocalBroker.Builder()
-      .setKafkaHostname("localhost")
-      .setKafkaPort(11111)
+      .setKafkaHostname(socialBDProperies.urlKafka.split(":")(0))
+      .setKafkaPort(socialBDProperies.urlKafka.split(":")(1).toInt)
       .setKafkaBrokerId(0)
       .setKafkaProperties(new Properties())
       .setKafkaTempDir("embedded_kafka")

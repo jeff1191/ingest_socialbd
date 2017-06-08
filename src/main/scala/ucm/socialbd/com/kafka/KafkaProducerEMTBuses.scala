@@ -29,10 +29,9 @@ class KafkaProducerEMTBuses(socialBDProperties: SocialBDProperties) extends Kafk
         if(nParada != stopList.size - 1) //skip header
           nParada = nParada + 1
         else{
-          System.exit(1)
           nParada = 1
         }
-        Thread.sleep(10000)
+        Thread.sleep(6000 )
         val urlRequest = socialBDProperties.eMTBusesConf.urlEMTBuses.replace("#inputIdStop#",stopList(nParada))
         val response: HttpResponse[String] = Http(urlRequest).asString
         val eventTime = response.headers.getOrElse("Date","Problem encountered").asInstanceOf[Vector[String]](0)

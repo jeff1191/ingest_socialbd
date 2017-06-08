@@ -7,11 +7,11 @@ import ucm.socialbd.com.config.SocialBDProperties
   * Created by Jeff on 24/04/2017.
   */
 object ZookeeperEmbedded {
-  def initCluster(socialBDProperies:SocialBDProperties): Unit = {
+  def initCluster(socialBDProperties:SocialBDProperties): Unit = {
     val zookeeperLocalCluster = new ZookeeperLocalCluster.Builder()
-    .setPort(12345)
+    .setPort(socialBDProperties.urlZookeeper.split(":")(1).toInt)
     .setTempDir("embedded_zookeeper")
-    .setZookeeperConnectionString("localhost:12345")
+    .setZookeeperConnectionString(socialBDProperties.urlZookeeper)
     .setMaxClientCnxns(60)
     .setElectionPort(20001)
     .setQuorumPort(20002)

@@ -40,7 +40,7 @@ class KafkaProducerBiciMAD(socialBDProperties: SocialBDProperties) extends Kafka
           producer.send(record)
           Thread.sleep(10)
         }
-        System.exit(1)
+        Thread.sleep(10000)
     }
   }catch{
       case e: NoSuchElementException =>{
